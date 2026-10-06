@@ -133,6 +133,8 @@ let debugTimer = 0;
 
 let objectCount = 0;
 
+let currentFps = 60;
+
 
 // ============================================================
 // INITIALIZE
@@ -404,6 +406,8 @@ function gameLoop() {
         CONFIG.maxDeltaTime
     );
 
+    currentFps = currentFps * 0.9 + (1 / Math.max(deltaTime, 0.001)) * 0.1;
+
     elapsedTime += deltaTime;
 
     updateGame(deltaTime);
@@ -518,14 +522,7 @@ function updateDebug() {
 
     debugElement.style.display = "block";
 
-    const fps = clock
-        ? Math.round(
-            1 / Math.max(
-                clock.getDelta(),
-                0.001
-            )
-        )
-        : 0;
+    const fps = Math.round(currentFps);
 
     debugElement.innerHTML =
         "FPS: " + fps +
