@@ -1,0 +1,16 @@
+// Step 4 phone-friendly object gallery.
+let galleryScene,galleryCamera,galleryRenderer,galleryTypes=[],galleryIndex=0,galleryObject=null,galleryPieces=[],galleryTitle,galleryType,galleryCutMode=false;
+/* This starts the object gallery. */
+function initializeGallery(scene,camera,renderer){galleryScene=scene;galleryCamera=camera;galleryRenderer=renderer;galleryTypes=getObjectTypeNames();createGalleryUI();initializeObjectPools(1);showGalleryObject();requestAnimationFrame(galleryAnimationLoop);}
+/* This creates the gallery labels and buttons. */
+function createGalleryUI(){const p=document.createElement("div");p.style.cssText="position:fixed;inset:0;z-index:50;pointer-events:none;font-family:Arial,sans-serif";document.body.appendChild(p);galleryTitle=document.createElement("div");galleryTitle.style.cssText="position:absolute;top:70px;left:50%;transform:translateX(-50%);padding:8px 14px;border-radius:8px;background:rgba(0,0,0,.65);color:white;font-size:20px;font-weight:bold";p.appendChild(galleryTitle);galleryType=document.createElement("div");galleryType.style.cssText="position:absolute;top:112px;left:50%;transform:translateX(-50%);color:white;font-size:14px";p.appendChild(galleryType);const a=createGalleryButton("Previous","left"),b=createGalleryButton("Next","right"),c=createGalleryButton("Cut Preview","center");a.onclick=()=>{galleryIndex=(galleryIndex-1+galleryTypes.length)%galleryTypes.length;galleryCutMode=false;showGalleryObject();};b.onclick=()=>{galleryIndex=(galleryIndex+1)%galleryTypes.length;galleryCutMode=false;showGalleryObject();};c.onclick=()=>{galleryCutMode=!galleryCutMode;showGalleryObject();};}
+/* This creates one gallery button. */
+function createGalleryButton(text,pos){const b=document.createElement("button");b.textContent=text;b.style.cssText="position:absolute;bottom:24px;min-width:95px;min-height:42px;border:0;border-radius:10px;background:rgba(255,255,255,.18);color:white;font-size:13px;font-weight:bold;pointer-events:auto;touch-action:manipulation";if(pos==="left")b.style.left="12px";else if(pos==="right")b.style.right="12px";else{b.style.left="50%";b.style.transform="translateX(-50%)";b.style.bottom="78px";}document.body.appendChild(b);return b;}
+/* This clears the previous gallery object. */
+function clearGalleryObject(){if(galleryObject){returnToPool(galleryObject);galleryObject=null;}removeSlicePieces(galleryPieces);galleryPieces=[];}
+/* This shows the selected object. */
+function showGalleryObject(){clearGalleryObject();const n=galleryTypes[galleryIndex],d=OBJECT_DATA[n];if(!d)return;galleryTitle.textContent=d.name;galleryType.textContent=d.type.toUpperCase();const o=getFromPool(n);if(!o)return;galleryObject=o;o.position.set(0,.5,0);o.visible=!galleryCutMode;galleryScene.add(o);if(galleryCutMode){galleryPieces=showSlicedHalves(o,galleryScene);if(galleryPieces[0])galleryPieces[0].position.x-=.65;if(galleryPieces[1])galleryPieces[1].position.x+=.65;}}
+/* This rotates the current gallery object or pieces. */
+function updateGalleryRotation(){if(galleryObject&&!galleryCutMode)galleryObject.rotation.y+=.01;for(const p of galleryPieces)p.rotation.y+=.01;}
+/* This renders the gallery continuously. */
+function galleryAnimationLoop(){requestAnimationFrame(galleryAnimationLoop);updateGalleryRotation();if(galleryRenderer)galleryRenderer.render(galleryScene,galleryCamera);}
