@@ -3,7 +3,7 @@
 // STEP 3 - SCENE / CAMERA / LIGHT / GROUND
 // ============================================================
 
-const CONFIG = {
+const CONFIG = {\n    GALLERY: true,
     // -------------------------
     // Debug
     // -------------------------
@@ -154,30 +154,33 @@ function initialize() {
     createScene();
     createCamera();
     createLights();
-    createGround();
-    createBackground();
     createRenderer();
 
     clock = new THREE.Clock();
 
+    if (CONFIG.GALLERY) {
+        window.addEventListener("resize", handleResize);
+        handleResize();
+        initializeGallery(scene, camera, renderer);
+        debugElement.style.display =
+            CONFIG.DEBUG ? "block" : "none";
+        updateDebug();
+        return;
+    }
+
+    createGround();
+    createBackground();
+
     updateDebug();
 
-    stateButton.addEventListener(
-        "click",
-        cycleGameState
-    );
+    stateButton.addEventListener("click", cycleGameState);
 
-    window.addEventListener(
-        "resize",
-        handleResize
-    );
+    window.addEventListener("resize", handleResize);
 
     handleResize();
 
     requestAnimationFrame(gameLoop);
 }
-
-
 // ============================================================
 // SCENE
 // ============================================================
